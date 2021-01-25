@@ -1,44 +1,53 @@
 var svgWidth = 960;
 var svgHeight = 660;
 
-var chartMargin = {
-  top: 30,
+let chartMargin = {
+  top: 10,
   right: 30,
   bottom: 30,
-  left: 30,
+  left: 60,
 };
 
-var chartWidth = svgWidth - chartMargin.left - chartMargin.right;
-var chartHeight = svgHeight - chartMargin.top - chartMargin.bottom;
+let chartWidth = svgWidth - chartMargin.left - chartMargin.right;
+let chartHeight = svgHeight - chartMargin.top - chartMargin.bottom;
 
-var svg = d3
-  .select("body")
+let svg = d3
+  .select("#scatter")
   .append("svg")
-  .attr("height", svgHeight)
-  .attr("width", svgWidth);
+  .attr("height", svgHeight + chartMargin.top + chartMargin.bottom)
+  .attr("width", svgWidth + chartMargin.left + chartMargin.right)
+  .append("g")
+  .attr("transform", "translate(" + chartMargin.left + "," + chartMargin.top + ")");
 
 dataFile = "assets/data/data.csv";
 d3.csv(dataFile).then((data) => {
-  console.log(data.poverty);
-  
-// scale for y axis
-  let yScale = d3
+  console.log(data[0].poverty);
+
+  // scale for y axis
+  let y = d3
     .scaleLinear()
-    .domain([0, d3.max(data, (item) => item.hours)])
+    .domain([0, d3.max(data, (item) => item.healthcare)])
     .range([chartHeight, 0]);
-// scale for x axis
-  let xScale = d3
+  svg.append("g").call(d3.axisLeft(y));
+
+  // scale for x axis
+  let x = d3
     .scaleBand()
-    .domain(data.map((item) => item.name))
+    .domain([0, data.map((item) => item.poverty)])
     .range([0, chartWidth])
     // .paddingInner(0.1)
     // .paddingOuter(0.2); //talk about xScale.step
-    .padding(0.2);
-// x and y axis
-  let bottomAxis = d3.axisBottom(xScale);
-  let leftAxis = d3.axisLeft(yScale).ticks(10);
+    // .padding(0.2);
+  svg
+    .append("g")
+    .attr("transform", "translate(0," + chartHeight + ")")
+    .call(d3.axisBottom(x));
 
-// adding data to scatter
+  // x and y axis
+//   let bottomAxis = d3.axisBottom(x);
+//   let leftAxis = d3.axisLeft(y).ticks(10);
+
+  // adding data to scatter
   svg
     .append("g")
     .selectAll("dot")
@@ -46,10 +55,10 @@ d3.csv(dataFile).then((data) => {
     .enter()
     .append("circle")
     .attr("cx", function (item) {
-      return xScale(item.healthcare);
+      return x(item.healthcare);
     })
     .attr("cy", function (item) {
-      return yScale(item.poverty);
+      return y(item.poverty);
     })
     .attr("r", 1.5)
     .style("fill", "#69b3a2");
