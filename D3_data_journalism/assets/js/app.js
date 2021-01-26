@@ -1,3 +1,4 @@
+// chart dimensions
 var svgWidth = 960;
 var svgHeight = 660;
 
@@ -11,6 +12,7 @@ let chartMargin = {
 let chartWidth = svgWidth - chartMargin.left - chartMargin.right;
 let chartHeight = svgHeight - chartMargin.top - chartMargin.bottom;
 
+// create svg
 let svg = d3
   .select("#scatter")
   .append("svg")
@@ -22,34 +24,56 @@ let svg = d3
     "translate(" + chartMargin.left + "," + chartMargin.top + ")"
   );
 
-dataFile = "assets/data/data.csv";
-d3.csv(dataFile).then((myData) => {
+// creating the scatterplot
+d3.csv("assets/data/data.csv").then((myData) => {
   myData.map((data) => {
     data.poverty = +data.poverty;
     data.healthcare = +data.healthcare;
-    console.log(data.abbr);
-    // console.log(d3.max(myData, (item) => item.healthcare));
+    console.log(data);
   });
-  console.log(d3.max(myData, (item) => item.healthcare));
 
   // scale for x axis
   let x = d3
     .scaleLinear()
-    .domain([d3.min(myData, (item) => item.poverty)-1, d3.max(myData, (item) => item.poverty)]) //data.map((item) => item.poverty)])
+    .domain([
+      d3.min(myData, (item) => item.poverty) - 1,
+      d3.max(myData, (item) => item.poverty),
+    ])
     .range([0, chartWidth]);
-
 
   // scale for y axis
   let y = d3
     .scaleLinear()
-    .domain([d3.min(myData, (item) => item.healthcare)-1, d3.max(myData, (item) => item.healthcare)])
+    .domain([
+      d3.min(myData, (item) => item.healthcare) - 1,
+      d3.max(myData, (item) => item.healthcare),
+    ])
     .range([chartHeight, 0]);
-  svg.append("g").call(d3.axisLeft(y));
 
+  // adding x axis and labels
   svg
     .append("g")
     .attr("transform", "translate(0," + chartHeight + ")")
     .call(d3.axisBottom(x));
+  svg
+    .append("text")
+    .attr(
+      "transform",
+      "translate(" + chartWidth / 2 + " ," + (chartHeight + chartMargin.top + 20) + ")"
+    )
+    .style("text-anchor", "middle")
+    .text("In Poverty (%)");
+
+  // adding y axis and labels
+  svg.append("g").call(d3.axisLeft(y));
+  svg
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0 - chartMargin.left)
+    .attr("x", 0 - chartHeight / 2)
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text("Lacks Healthcare (%)");
 
   // adding data to scatter
   svg
@@ -64,15 +88,22 @@ d3.csv(dataFile).then((myData) => {
     .attr("cy", function (item) {
       return y(item.healthcare);
     })
-    .attr("r", 10)
-    .style("fill", "#69b3a2")
-    .append("text").text(function(item){
+    .attr("r", 13)
+    .style("fill", "#89bdd3");
+  svg
+    .append("g")
+    .selectAll("dot")
+    .data(myData)
+    .enter()
+    .append("text")
+    .attr("text-anchor", "middle")
+    .text(function (item) {
       return item.abbr;
     })
     .attr("x", function (item) {
       return x(item.poverty);
     })
     .attr("y", function (item) {
-      return y(item.healthcare);
+      return y(item.healthcare) + 5;
     });
 });
