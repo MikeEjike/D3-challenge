@@ -27,7 +27,7 @@ d3.csv(dataFile).then((myData) => {
   myData.map((data) => {
     data.poverty = +data.poverty;
     data.healthcare = +data.healthcare;
-    console.log(data);
+    console.log(data.abbr);
     // console.log(d3.max(myData, (item) => item.healthcare));
   });
   console.log(d3.max(myData, (item) => item.healthcare));
@@ -35,16 +35,14 @@ d3.csv(dataFile).then((myData) => {
   // scale for x axis
   let x = d3
     .scaleLinear()
-    .domain([0, d3.max(myData, (item) => item.poverty)]) //data.map((item) => item.poverty)])
+    .domain([d3.min(myData, (item) => item.poverty)-1, d3.max(myData, (item) => item.poverty)]) //data.map((item) => item.poverty)])
     .range([0, chartWidth]);
-  // .paddingInner(0.1)
-  // .paddingOuter(0.2); //talk about xScale.step
-  // .padding(0.2);
+
 
   // scale for y axis
   let y = d3
     .scaleLinear()
-    .domain([0, d3.max(myData, (item) => item.healthcare)])
+    .domain([d3.min(myData, (item) => item.healthcare)-1, d3.max(myData, (item) => item.healthcare)])
     .range([chartHeight, 0]);
   svg.append("g").call(d3.axisLeft(y));
 
@@ -52,10 +50,6 @@ d3.csv(dataFile).then((myData) => {
     .append("g")
     .attr("transform", "translate(0," + chartHeight + ")")
     .call(d3.axisBottom(x));
-
-  // x and y axis
-  //   let bottomAxis = d3.axisBottom(x);
-  //   let leftAxis = d3.axisLeft(y).ticks(10);
 
   // adding data to scatter
   svg
@@ -70,7 +64,15 @@ d3.csv(dataFile).then((myData) => {
     .attr("cy", function (item) {
       return y(item.healthcare);
     })
-    .attr("r", 1.5)
-    .style("fill", "#69b3a2");
-  //   });
+    .attr("r", 10)
+    .style("fill", "#69b3a2")
+    .append("text").text(function(item){
+      return item.abbr;
+    })
+    .attr("x", function (item) {
+      return x(item.poverty);
+    })
+    .attr("y", function (item) {
+      return y(item.healthcare);
+    });
 });
