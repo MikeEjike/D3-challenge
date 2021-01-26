@@ -25,17 +25,12 @@ let svg = d3
 dataFile = "assets/data/data.csv";
 d3.csv(dataFile).then((myData) => {
   myData.map((data) => {
-      console.log((data))
+    data.poverty = +data.poverty;
+    data.healthcare = +data.healthcare;
+    console.log(data);
     // console.log(d3.max(myData, (item) => item.healthcare));
   });
-  console.log(d3.max(myData, item => item.healthcare));
-
-  // scale for y axis
-  let y = d3
-    .scaleLinear()
-    .domain([0, d3.max(myData, (item) => item.healthcare)])
-    .range([chartHeight, 0]);
-  svg.append("g").call(d3.axisLeft(y));
+  console.log(d3.max(myData, (item) => item.healthcare));
 
   // scale for x axis
   let x = d3
@@ -45,6 +40,14 @@ d3.csv(dataFile).then((myData) => {
   // .paddingInner(0.1)
   // .paddingOuter(0.2); //talk about xScale.step
   // .padding(0.2);
+
+  // scale for y axis
+  let y = d3
+    .scaleLinear()
+    .domain([0, d3.max(myData, (item) => item.healthcare)])
+    .range([chartHeight, 0]);
+  svg.append("g").call(d3.axisLeft(y));
+
   svg
     .append("g")
     .attr("transform", "translate(0," + chartHeight + ")")
