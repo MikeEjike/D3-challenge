@@ -12,7 +12,7 @@ The data set included with the assignment is based on 2014 ACS 1-year estimates:
 
 ### Core Assignment: D3 Dabbler (Required Assignment)
 
-![4-scatter](Images/4-scatter.jpg)
+![4-scatter](D3_data_journalism/Images/4-scatter.jpg)
 
 Scatter plot created between the data variables `Healthcare vs. Poverty`.
 
